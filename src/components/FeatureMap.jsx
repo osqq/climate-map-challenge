@@ -4,11 +4,10 @@ import styled from "styled-components";
 import L from "leaflet";
 
 const MapContainer = styled(Map)`
-    width: calc(100vw - 300px);
+    width: 100vw;
     height: 100vh;
     position:absolute;
     top:0px;
-    left:300px;
 `;
 
 

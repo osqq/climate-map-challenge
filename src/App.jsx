@@ -14,7 +14,6 @@ const App = () => {
   useEffect(() => {
 
     navigator.geolocation.getCurrentPosition(function(position) {
-      console.log("test");
       const currLocation = [position.coords.latitude, position.coords.longitude];
       setCurrentLocation(currLocation);
     });
@@ -37,9 +36,7 @@ const App = () => {
           }
 
           setObservationLocations(data.locations.map(loc => {
-            console.log(loc);
               const [lon, lat] = loc.info.position.map(parseFloat);
-              console.log(lon);
               return {...loc, position: {lat, lon}}
             })
           );
