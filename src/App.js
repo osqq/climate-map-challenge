@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Metolib from '@fmidev/metolib';
 import './App.css';
-import {Map, Marker, TileLayer} from "react-leaflet";
+import { Map, Marker, TileLayer, Popup } from "react-leaflet";
 import styled from "styled-components";
 import L from "leaflet";
-import Sidebar from './Sidebar';
+import Sidebar from './components/Sidebar';
 
 const MapContainer = styled(Map)`
     width: calc(100vw - 300px);
@@ -24,7 +24,7 @@ L.Icon.Default.mergeOptions({
 });
 
 
-function App() {
+const App = () => {
   const [observationLocations, setObservationLocations] = useState([]);
 
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -47,9 +47,10 @@ function App() {
             return;
           }
 
-          setObservationLocations(data.locations
-            .map(loc => {
+          setObservationLocations(data.locations.map(loc => {
+            console.log(loc);
               const [lon, lat] = loc.info.position.map(parseFloat);
+              console.log(lon);
               return {...loc, position: {lat, lon}}
             })
           );
@@ -59,26 +60,25 @@ function App() {
       });
     }
   }, []);
-
+  console.log(observationLocations);
   const position = [65, 26];
-  const map = (
-    <MapContainer center={position} zoom={6}>
-      <TileLayer
-        url='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        subdomains='abcd'
-        maxZoom={19}
-      />
-      {observationLocations.map(loc => <Marker position={[loc.position.lat, loc.position.lon]}
-                                               key={loc.info.id} onClick={() => setSelectedLocation(loc.info.id)}>
-      </Marker>)}
-    </MapContainer>
-  );
 
   return (
     <div className="App">
       <Sidebar selectedLocationId={selectedLocation} observationLocations={observationLocations}/>
-      {map}
+      <MapContainer center={position} zoom={6}>
+        <TileLayer
+          url='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy;'
+          maxZoom={19}
+        />
+        {observationLocations.map(loc => 
+          <Marker position={[loc.position.lon, loc.position.lat]} key={loc.info.id} onClick={() => setSelectedLocation(loc.info.id)}>
+            <Popup>
+              {loc.info.name}
+            </Popup>
+          </Marker>)}
+    </MapContainer>
     </div>
   );
 
