@@ -1,35 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import Metolib from '@fmidev/metolib';
 import './App.css';
-import { Map, Marker, TileLayer, Popup } from "react-leaflet";
-import styled from "styled-components";
-import L from "leaflet";
 import Sidebar from './components/Sidebar';
-
-const MapContainer = styled(Map)`
-    width: calc(100vw - 300px);
-    height: 100vh;
-    position:absolute;
-    top:0px;
-    left:300px;
-`;
-
-
-// Ugly hack to fix Leaflet icons with leaflet loaders
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-
+import FeatureMap from './components/FeatureMap';
 
 const App = () => {
   const [observationLocations, setObservationLocations] = useState([]);
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
-  useEffect(function fetchObservationLocations() {
+  const [currentLocation, setCurrentLocation] = useState([65,26]);
+
+  useEffect(() => {
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+      console.log("test");
+      const currLocation = [position.coords.latitude, position.coords.longitude];
+      setCurrentLocation(currLocation);
+    });
+
     const connection = new Metolib.WfsConnection();
     if (connection.connect('http://opendata.fmi.fi/wfs', 'fmi::observations::weather::cities::multipointcoverage')) {
       connection.getData({
@@ -60,25 +49,11 @@ const App = () => {
       });
     }
   }, []);
-  console.log(observationLocations);
-  const position = [65, 26];
-
+  
   return (
     <div className="App">
-      <Sidebar selectedLocationId={selectedLocation} observationLocations={observationLocations}/>
-      <MapContainer center={position} zoom={6}>
-        <TileLayer
-          url='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy;'
-          maxZoom={19}
-        />
-        {observationLocations.map(loc => 
-          <Marker position={[loc.position.lon, loc.position.lat]} key={loc.info.id} onClick={() => setSelectedLocation(loc.info.id)}>
-            <Popup>
-              {loc.info.name}
-            </Popup>
-          </Marker>)}
-    </MapContainer>
+      <Sidebar selectedLocationId={selectedLocation} observationLocations={observationLocations} />
+      <FeatureMap currentLocation={currentLocation} observationLocations={observationLocations} selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
     </div>
   );
 
