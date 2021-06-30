@@ -23,17 +23,17 @@ const FeatureMap = ({ currentLocation, observationLocations, setSelectedLocation
   
   return (
     <>
-      <MapContainer center={currentLocation} zoom={15}>
+      <MapContainer center={currentLocation} zoom={13}>
         <TileLayer
           url='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy;'
           maxZoom={19}
         />
         <Marker position={currentLocation}>
-            <Popup>
-              Koti
-            </Popup>
-          </Marker>
+          <Popup>
+            Koti
+          </Popup>
+        </Marker>
         {observationLocations.map(loc => 
           <Marker position={[loc.position.lon, loc.position.lat]} key={loc.info.id} onClick={() => setSelectedLocation(loc.info.id)}>
             <Popup>

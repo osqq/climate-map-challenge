@@ -3,6 +3,7 @@ import Metolib from '@fmidev/metolib';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import FeatureMap from './components/FeatureMap';
+import CustomSpinner from './spinner/CustomSpinner'
 
 const App = () => {
   const [observationLocations, setObservationLocations] = useState([]);
@@ -10,6 +11,8 @@ const App = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   const [currentLocation, setCurrentLocation] = useState([65,26]);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
@@ -28,7 +31,6 @@ const App = () => {
         bbox: "20.6455928891, 59.846373196, 31.5160921567, 70.1641930203",
         callback: (data, errors) => {
           if (errors.length > 0) {
-
             errors.forEach(err => {
               console.error('FMI API error: ' + err.errorText);
             });
@@ -41,6 +43,7 @@ const App = () => {
             })
           );
 
+          setLoading(false);
           connection.disconnect();
         }
       });
@@ -49,6 +52,7 @@ const App = () => {
   
   return (
     <div className="App">
+      {loading ? (<CustomSpinner/>) : null}
       <Sidebar selectedLocationId={selectedLocation} observationLocations={observationLocations} />
       <FeatureMap currentLocation={currentLocation} observationLocations={observationLocations} selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
     </div>
